@@ -1,0 +1,25 @@
+{
+  "name": "pull_request_lint",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arjankowski/pull_request_lint.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/arjankowski/pull_request_lint/issues"
+  },
+  "homepage": "https://github.com/arjankowski/pull_request_lint#readme",
+  "dependencies": {
+    "@actions/core": "^1.6.0",
+    "@actions/github": "^5.0.0",
+    "markdown-spellcheck": "^1.3.1"
+  }
+}

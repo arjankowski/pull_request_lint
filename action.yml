@@ -1,0 +1,13 @@
+name: "PR Lint"
+description: "Checks if the PR Title follows developer platform rules."
+inputs:
+  spelling-file-url:
+    description: 'URL for spelling file that will be included during spellcheck'
+    required: true
+    default: 'https://raw.githubusercontent.com/box/box-developer-changelog/main/.spelling'
+  spelling-list:
+    description: 'Additional spelling list separated by space'
+    required: false
+runs:
+  using: 'node16'
+  main: 'index.js'
