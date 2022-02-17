@@ -8,6 +8,10 @@ inputs:
   spelling-list:
     description: 'Additional spelling list separated by space'
     required: false
+  validate-visible-sections-only:
+    description: 'If true then only PR title with `type` set not to be hidden in .versionrc based on `Conventional Commits` will be validated'
+    required: true
+    default: true
 runs:
   using: 'node16'
   main: 'index.js'

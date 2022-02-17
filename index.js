@@ -8,8 +8,10 @@ const spellcheck = require('markdown-spellcheck');
 async function run() {
   try {
       const spelling_file_url = core.getInput('spelling-file-url');
-      const spelling_list = core.getInput('spelling-list')
+      const spelling_list = core.getInput('spelling-list');
+      const validate_visible_sections_only = core.getBooleanInput('validate-visible-sections-only');
 
+      const versionrc_path = '.versionrc';
       const dictionary_path = path.join(__dirname, 'dictionaries', 'en_US');
       const fallback_spelling_path = path.join(__dirname, 'fallback.spelling');
       const downloaded_spelling_path = path.join(__dirname, 'downloaded.spelling');
@@ -23,6 +25,10 @@ async function run() {
         dictionary: {
             language: "en-us", 
             file: `${dictionary_path}`}
+        }
+
+        if (!shouldExecuteSpellcheck(validate_visible_sections_only, pull_request_title, versionrc_path)){
+            return
         }
 
         fs.writeFileSync(file_to_spellcheck, pull_request_title);
@@ -48,6 +54,38 @@ async function run() {
     } catch (error) {
         core.setFailed(error.message);
     }
+}
+
+function getExcludedCommitTypes(versionrc_path) {
+    if (!fs.existsSync(versionrc_path)) {
+        core.info(`"${versionrc_path}\" is not exists!`);
+        return []
+    }
+
+    return fs.readFileSync(versionrc_path, 'utf8')
+        .split('\n')
+        .filter((item) => item.includes('\"type\":'))
+        .filter((item) => item.match(/"hidden": *true/))
+        .map((item) => item.match(/"type": "(?<type>.*)",/).groups.type)
+}
+
+function shouldExecuteSpellcheck(validate_visible_sections_only, pull_request_title, versionrc_path) {
+    if (!validate_visible_sections_only) {
+        return true
+    }
+
+    const excludedCommitTypes = getExcludedCommitTypes(versionrc_path);
+    const commit_type = pull_request_title
+        .split(':')[0]
+        .split('(')[0]
+
+    const shouldExecuteSpellcheck = !excludedCommitTypes.includes(commit_type);
+    if (!shouldExecuteSpellcheck) {
+        core.info(`Current pull request title \"${pull_request_title}\" will not be validated.`);
+        core.info(`This is because \"validate-visible-sections-only\" parameters is set to 'true' and commit type \"${commit_type}\" is set to be hidden in ${versionrc_path} file.`);
+    }
+
+    return shouldExecuteSpellcheck;
 }
 
 function extendDictionarySpelling(dictionary_path, spelling_path, spelling_list){
